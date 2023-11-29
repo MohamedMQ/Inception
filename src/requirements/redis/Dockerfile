@@ -1,0 +1,8 @@
+FROM debian:bullseye
+
+RUN apt update \
+    && apt install -y \
+    redis-server iputils-ping
+COPY ./tools/script.sh /
+RUN chmod +x /script.sh
+CMD [ "/script.sh" ]

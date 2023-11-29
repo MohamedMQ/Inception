@@ -1,0 +1,110 @@
+version: '3.5'
+services:
+  nginx:
+    container_name: nginx
+    build: requirements/nginx/
+    depends_on:
+      - wordpress
+    ports:
+      - "443:443"
+    networks:
+      - mynetwork
+    volumes:
+      - WordPress:/var/www/html
+    restart: on-failure
+
+  wordpress:
+    container_name: wordpress
+    build: requirements/wordpress/
+    depends_on:
+      - mariadb
+    networks:
+      - mynetwork
+    volumes:
+     - WordPress:/var/www/html
+    env_file: .env
+    restart: on-failure
+  
+  mariadb:
+    container_name: mariadb
+    build: requirements/mariadb/
+    networks:
+      - mynetwork
+    volumes:
+      - db:/var/lib/mysql
+    env_file: .env
+    restart: on-failure
+
+  redis:
+    container_name: redis
+    build: requirements/redis/
+    networks:
+      - mynetwork
+    env_file: .env
+    restart: on-failure
+
+  ftp:
+    container_name: ftp
+    build: requirements/ftp/
+    volumes:
+      - WordPress:/var/www/html
+    networks:
+      - mynetwork
+    ports:
+      - "21:21"
+      - "10000-10100:10000-10100"
+    env_file: .env
+    restart: on-failure
+  
+  cadvisor:
+    container_name: cadvisor
+    build: requirements/cadvisor/
+    restart: on-failure
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "8080:8080"
+    networks:
+      - mynetwork
+    restart: on-failure
+
+  adminer:
+    build: requirements/adminer
+    container_name: adminer
+    ports:
+      - "9150:9150"
+    networks:
+      - mynetwork
+    restart: on-failure
+
+  website:
+    container_name: website
+    build: requirements/website/
+    networks:
+      - mynetwork
+    ports:
+      - "9100:9100"
+    restart: on-failure
+
+networks:
+  mynetwork:
+    name : mynetwork
+    driver : bridge
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: /home/mohamedmaq/Desktop/data/db
+
+  WordPress:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: /home/mohamedmaq/Desktop/data/wp
