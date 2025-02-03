@@ -1,7 +1,7 @@
 all: up
 
 up:
-@mkdir -p /home/mohamedmaq/Desktop/data/wp \
+	@mkdir -p /home/mohamedmaq/Desktop/data/wp \
 		/home/mohamedmaq/Desktop/data/db
 	@docker-compose -f ./src/docker-compose.yml up
 down:
